@@ -1,0 +1,137 @@
+<div class="pricing-card">
+  <!-- Accordion Header -->
+  <div class="accordion-header" (click)="toggleExpand()" role="button" tabindex="0">
+    <div class="header-title-wrap">
+      <span class="header-title">{{ section().title }}</span>
+      <span class="header-badge">Size-Based Matrix: {{ section().size_tier.length }} Sizes × {{ section().item_tier.length }} Tiers</span>
+    </div>
+    <button class="toggle-btn" [attr.aria-expanded]="isExpanded()" type="button">
+      {{ isExpanded() ? '-' : '+' }}
+    </button>
+  </div>
+
+  <!-- Accordion Body -->
+  @if (isExpanded()) {
+    <div class="card-body">
+      <!-- Actions Bar -->
+      <div class="actions-bar">
+        <button class="btn-add-col" (click)="addColumn()" type="button">
+          + Add Column
+        </button>
+        <button class="btn-add-row" (click)="addSizeRow()" type="button">
+          + Add Size Row
+        </button>
+      </div>
+
+      <!-- Size-Based Pricing Matrix Grid -->
+      <div class="table-scroll-container">
+        <table class="size-matrix-table">
+          <thead>
+            <tr>
+              <th class="sticky-col size-corner-th">
+                <span class="th-corner-text">Size \ Item Tier</span>
+              </th>
+              @for (tier of section().item_tier; track trackByIndex($index); let colIdx = $index) {
+                <th class="matrix-th">
+                  <div class="th-content">
+                    <div class="col-delete-wrapper">
+                      @if (section().item_tier.length > 1) {
+                        <button
+                          class="btn-remove-col"
+                          (click)="removeColumn(colIdx)"
+                          title="Remove tier column"
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      } @else {
+                        <span class="btn-remove-placeholder"></span>
+                      }
+                    </div>
+                    <input
+                      type="text"
+                      class="cell-input tier-header-input"
+                      [ngModel]="tier"
+                      (ngModelChange)="onTierChange(colIdx, $event)"
+                      placeholder="Tier"
+                      title="Item tier column {{ colIdx + 1 }}"
+                    />
+                  </div>
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of section().size_tier; track trackByIndex($index); let rowIdx = $index) {
+              <tr>
+                <!-- Sticky Size Column -->
+                <td class="sticky-col size-label-td">
+                  <div class="size-cell-wrapper">
+                    <div class="size-input-group">
+                      <label class="size-tag">Size</label>
+                      <input
+                        type="text"
+                        class="cell-input size-input"
+                        [ngModel]="row.size"
+                        (ngModelChange)="onSizeChange(rowIdx, $event)"
+                        placeholder="Size"
+                        title="Size value"
+                      />
+                    </div>
+                    @if (section().size_tier.length > 1) {
+                      <button
+                        class="btn-remove-row"
+                        (click)="removeSizeRow(rowIdx)"
+                        title="Remove size row"
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    }
+                  </div>
+                </td>
+
+                <!-- Price Cells for this Size Row -->
+                @for (p of row.price; track trackByIndex($index); let colIdx = $index) {
+                  <td class="price-td">
+                    <input
+                      type="text"
+                      class="cell-input price-matrix-input"
+                      [ngModel]="p"
+                      (ngModelChange)="onPriceChange(rowIdx, colIdx, $event)"
+                      placeholder="0.00"
+                      title="Price for Size {{ row.size }} at Tier {{ section().item_tier[colIdx] }}"
+                    />
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Discount Input -->
+      <div class="discount-container">
+        <label class="field-label">Discount <span class="required">*</span></label>
+        <input
+          type="number"
+          class="field-input discount-input"
+          [ngModel]="section().discount"
+          (ngModelChange)="onDiscountChange($event)"
+          placeholder="0"
+          step="any"
+        />
+      </div>
+
+      <!-- Nested Additional Charges (Inside FR) -->
+      @if (section().additional_charge && section().additional_charge.length > 0) {
+        <app-additional-charges
+          [charges]="section().additional_charge"
+          [sectionId]="section().id + '_additional_charge'"
+          [title]="section().title + ' - ADDITIONAL CHARGES'"
+          [isNested]="true"
+        />
+      }
+    </div>
+  }
+</div>

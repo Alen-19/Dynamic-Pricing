@@ -1,0 +1,89 @@
+<div class="pricing-card">
+  <!-- Accordion Header -->
+  <div class="accordion-header" (click)="toggleExpand()" role="button" tabindex="0">
+    <div class="header-title-wrap">
+      <span class="header-title">{{ section().title }}</span>
+      <span class="header-badge">{{ section().item_tier.length }} Tiers</span>
+    </div>
+    <button class="toggle-btn" [attr.aria-expanded]="isExpanded()" type="button">
+      {{ isExpanded() ? '-' : '+' }}
+    </button>
+  </div>
+
+  <!-- Accordion Body -->
+  @if (isExpanded()) {
+    <div class="card-body">
+      <!-- Add Column Button -->
+      <div class="actions-bar">
+        <button class="btn-add-col" (click)="addColumn()" type="button">
+          + Add Column
+        </button>
+      </div>
+
+      <!-- Pricing Matrix Grid -->
+      <div class="table-scroll-container">
+        <div class="pricing-matrix">
+          <!-- Tier Header Row -->
+          <div class="matrix-row header-row">
+            @for (tier of section().item_tier; track trackByIndex($index); let i = $index) {
+              <div class="col-cell header-cell">
+                <div class="col-delete-wrapper">
+                  @if (section().item_tier.length > 1) {
+                    <button
+                      class="btn-remove-col"
+                      (click)="removeColumn(i)"
+                      title="Remove tier column"
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  } @else {
+                    <span class="btn-remove-placeholder"></span>
+                  }
+                </div>
+                <input
+                  type="text"
+                  class="cell-input tier-input"
+                  [ngModel]="tier"
+                  (ngModelChange)="onTierChange(i, $event)"
+                  placeholder="Tier"
+                  title="Item tier value"
+                />
+              </div>
+            }
+          </div>
+
+          <!-- Price Row -->
+          <div class="matrix-row price-row">
+            @for (p of section().price; track trackByIndex($index); let i = $index) {
+              <div class="col-cell price-cell">
+                <label class="cell-label">Price</label>
+                <input
+                  type="text"
+                  class="cell-input price-input"
+                  [ngModel]="p"
+                  (ngModelChange)="onPriceChange(i, $event)"
+                  placeholder="0.00"
+                  title="Price for tier {{ section().item_tier[i] }}"
+                />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Discount Input -->
+      <div class="discount-container">
+        <label class="field-label">Discount <span class="required">*</span></label>
+        <input
+          type="number"
+          class="field-input discount-input"
+          [ngModel]="section().discount"
+          (ngModelChange)="onDiscountChange($event)"
+          placeholder="0"
+          step="any"
+        />
+      </div>
+    </div>
+  }
+</div>

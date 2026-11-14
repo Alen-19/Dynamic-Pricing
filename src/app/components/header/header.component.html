@@ -1,0 +1,139 @@
+<header class="app-header">
+  <div class="header-main">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+      </div>
+      <div class="brand-titles">
+        <h1 class="brand-name">Dynamic Pricing Manager</h1>
+        <span class="brand-subtitle">Signal-Driven Reactive Pricing & Tier Matrix</span>
+      </div>
+    </div>
+
+    <div class="header-search">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Filter sections or charges..."
+          [ngModel]="pricingService.searchQuery()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+        @if (pricingService.searchQuery()) {
+          <button class="clear-search" (click)="onSearchChange('')" title="Clear search">×</button>
+        }
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Undo / Redo -->
+      <div class="btn-group">
+        <button
+          class="btn-icon"
+          [disabled]="!pricingService.canUndo()"
+          (click)="pricingService.undo()"
+          title="Undo (Ctrl+Z)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 7v6h6" />
+            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
+          </svg>
+        </button>
+        <button
+          class="btn-icon"
+          [disabled]="!pricingService.canRedo()"
+          (click)="pricingService.redo()"
+          title="Redo (Ctrl+Y)"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 7v6h-6" />
+            <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Expand / Collapse All -->
+      <div class="btn-group">
+        <button class="btn btn-secondary" (click)="pricingService.expandAll()" title="Expand all accordion sections">
+          Expand All
+        </button>
+        <button class="btn btn-secondary" (click)="pricingService.collapseAll()" title="Collapse all accordion sections">
+          Collapse All
+        </button>
+      </div>
+
+      <!-- JSON Drawer Toggle -->
+      <button class="btn btn-primary" (click)="toggleJsonDrawer.emit()" title="View live JSON output">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+        <span>Live JSON</span>
+      </button>
+
+      <!-- Import / Export / Reset -->
+      <div class="dropdown-actions">
+        <label class="btn btn-outline file-input-label" title="Import JSON file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span>Import</span>
+          <input type="file" accept=".json" (change)="onFileSelected($event)" style="display: none;" />
+        </label>
+
+        <button class="btn btn-outline" (click)="onExport()" title="Export JSON file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          <span>Export</span>
+        </button>
+
+        <button class="btn btn-danger-outline" (click)="onReset()" title="Reset to default data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
+            <path d="M21 3v5h-5" />
+            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
+            <path d="M8 16H3v5" />
+          </svg>
+          <span>Reset</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Stats Bar -->
+  <div class="header-stats">
+    <div class="stat-item">
+      <span class="stat-label">Sections:</span>
+      <span class="stat-value">{{ pricingService.stats().flatSectionsCount + pricingService.stats().sizeBasedSectionsCount }}</span>
+    </div>
+    <div class="stat-separator">|</div>
+    <div class="stat-item">
+      <span class="stat-label">Tier Columns:</span>
+      <span class="stat-value highlight">{{ pricingService.stats().totalColumns }}</span>
+    </div>
+    <div class="stat-separator">|</div>
+    <div class="stat-item">
+      <span class="stat-label">Price Data Points:</span>
+      <span class="stat-value">{{ pricingService.stats().totalPricePoints }}</span>
+    </div>
+    <div class="stat-separator">|</div>
+    <div class="stat-item">
+      <span class="stat-label">Additional Charges:</span>
+      <span class="stat-value">{{ pricingService.stats().totalAdditionalCharges }}</span>
+    </div>
+    <div class="stat-badge">
+      <span class="pulse-dot"></span>
+      Signal-Reactive Live
+    </div>
+  </div>
+</header>

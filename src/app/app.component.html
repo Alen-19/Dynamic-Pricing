@@ -1,0 +1,110 @@
+<div class="app-layout">
+  <!-- Top Navigation Header -->
+  <app-header (toggleJsonDrawer)="isJsonDrawerOpen.set(!isJsonDrawerOpen())" />
+
+  <!-- Main Content Container -->
+  <main class="main-container">
+    <!-- Category Filter Tabs -->
+    <div class="filter-tabs-bar">
+      <div class="tabs-group">
+        <button
+          class="tab-btn"
+          [class.active]="currentFilter() === 'all'"
+          (click)="setFilter('all')"
+          type="button"
+        >
+          All Pricing Sections
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="currentFilter() === 'flat'"
+          (click)="setFilter('flat')"
+          type="button"
+        >
+          Flat Pricing
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="currentFilter() === 'size_based'"
+          (click)="setFilter('size_based')"
+          type="button"
+        >
+          Size-Based (FR)
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="currentFilter() === 'additional'"
+          (click)="setFilter('additional')"
+          type="button"
+        >
+          Additional Charges
+        </button>
+      </div>
+
+      <div class="tabs-info">
+        @if (pricingService.searchQuery()) {
+          <span class="search-indicator">
+            Filtering by "<em>{{ pricingService.searchQuery() }}</em>"
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Pricing Sections -->
+    <div class="sections-container">
+      <!-- 1. Primary Flat Sections: DEFAULT, INSERTS (matching screenshot order) -->
+      @if (shouldShowFlat()) {
+        @for (sec of getPrimaryFlatSections(); track sec.id) {
+          <app-flat-pricing-table [section]="sec" />
+        }
+      }
+
+      <!-- 2. Size-Based Section: FR (matching screenshot order) -->
+      @if (shouldShowSizeBased()) {
+        @for (sb of pricingService.sizeBasedSections(); track sb.id) {
+          <app-size-based-pricing-table [section]="sb" />
+        }
+      }
+
+      <!-- 3. Additional Charge Section (matching screenshot order) -->
+      @if (shouldShowAdditional()) {
+        <app-additional-charges />
+      }
+
+      <!-- 4. Other Flat Sections: FANCY, HI_VIS, REFLECTIVE, FANCY_INSERTS -->
+      @if (shouldShowFlat()) {
+        @for (sec of getSecondaryFlatSections(); track sec.id) {
+          <app-flat-pricing-table [section]="sec" />
+        }
+      }
+
+      <!-- Empty State if search matches nothing -->
+      @if (
+        pricingService.flatSections().length === 0 &&
+        pricingService.sizeBasedSections().length === 0 &&
+        pricingService.rootAdditionalCharges().length === 0
+      ) {
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <h3>No pricing sections found</h3>
+          <p>No results matched your search "{{ pricingService.searchQuery() }}".</p>
+          <button class="btn-clear-filter" (click)="pricingService.searchQuery.set('')">
+            Clear Search Filter
+          </button>
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- Live JSON Drawer -->
+  <app-json-drawer
+    [isOpen]="isJsonDrawerOpen()"
+    (closeDrawer)="isJsonDrawerOpen.set(false)"
+  />
+
+  <!-- Floating Toast Notifications -->
+  <app-toast />
+</div>

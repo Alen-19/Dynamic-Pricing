@@ -1,0 +1,161 @@
+<div class="pricing-card" [class.nested-card]="isNested()">
+  <!-- Accordion Header -->
+  <div class="accordion-header" (click)="toggleExpand()" role="button" tabindex="0">
+    <div class="header-title-wrap">
+      <span class="header-title">{{ title() }}</span>
+      <span class="header-badge">{{ effectiveCharges().length }} Items</span>
+    </div>
+    <button class="toggle-btn" [attr.aria-expanded]="isExpanded()" type="button">
+      {{ isExpanded() ? '-' : '+' }}
+    </button>
+  </div>
+
+  <!-- Accordion Body -->
+  @if (isExpanded()) {
+    <div class="card-body">
+      <div class="charges-grid">
+        @for (charge of effectiveCharges(); track charge.key) {
+          <div class="charge-item-block">
+            <h4 class="charge-title">{{ charge.label }}</h4>
+
+            <!-- 1. Fixed Price Charge (e.g. Blunt Corners, Square Corners, etc.) -->
+            @if (charge.type === 'fixed_price') {
+              <div class="field-group">
+                <label class="field-label">Price <span class="required">*</span></label>
+                <input
+                  type="text"
+                  class="field-input charge-input"
+                  [ngModel]="charge.price"
+                  (ngModelChange)="onPriceChange(charge.key, $event)"
+                  placeholder="0.00"
+                />
+              </div>
+            }
+
+            <!-- 2. Percentage Charge (e.g. Irregular Shape) -->
+            @if (charge.type === 'percentage') {
+              <div class="field-group">
+                <label class="field-label">Percentage <span class="required">*</span></label>
+                <input
+                  type="text"
+                  class="field-input charge-input"
+                  [ngModel]="charge.percentage"
+                  (ngModelChange)="onPercentageChange(charge.key, $event)"
+                  placeholder="0"
+                />
+              </div>
+            }
+
+            <!-- 3. Threshold Charge (e.g. Stitch Overcharge, No of Color Overcharge) -->
+            @if (charge.type === 'threshold') {
+              <div class="threshold-fields">
+                <div class="field-group">
+                  <label class="field-label">Over <span class="required">*</span></label>
+                  <input
+                    type="number"
+                    class="field-input small-input"
+                    [ngModel]="charge.over"
+                    (ngModelChange)="onThresholdChange(charge.key, 'over', $event)"
+                    placeholder="Threshold"
+                  />
+                </div>
+
+                @if (charge.every !== undefined) {
+                  <div class="field-group">
+                    <label class="field-label">Every</label>
+                    <input
+                      type="number"
+                      class="field-input small-input"
+                      [ngModel]="charge.every"
+                      (ngModelChange)="onThresholdChange(charge.key, 'every', $event)"
+                      placeholder="Interval"
+                    />
+                  </div>
+                }
+
+                <div class="field-group">
+                  <label class="field-label">Price <span class="required">*</span></label>
+                  <input
+                    type="text"
+                    class="field-input small-input"
+                    [ngModel]="charge.price"
+                    (ngModelChange)="onThresholdChange(charge.key, 'price', $event)"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+            }
+
+            <!-- 4. Tier-based Charge (e.g. Size Surcharge, Velcro, Pressure Sensitive) -->
+            @if (charge.type === 'tiered') {
+              <div class="tiered-charge-container">
+                <div class="tiered-actions">
+                  <span class="tiered-desc">
+                    Tiers by size with corresponding {{ asTiered(charge).valueType }}:
+                  </span>
+                  <button
+                    class="btn-add-tier"
+                    (click)="addTier(charge.key, charge.label)"
+                    type="button"
+                  >
+                    + Add Tier
+                  </button>
+                </div>
+
+                <div class="tiered-table-wrapper">
+                  <table class="tiered-table">
+                    <thead>
+                      <tr>
+                        <th>Size Tier Threshold (≤)</th>
+                        <th>
+                          {{ asTiered(charge).valueType === 'percentage' ? 'Percentage (%)' : 'Price ($)' }}
+                        </th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (t of asTiered(charge).size_tier; track trackByIndex($index); let tIdx = $index) {
+                        <tr>
+                          <td>
+                            <input
+                              type="text"
+                              class="field-input tier-table-input"
+                              [ngModel]="t"
+                              (ngModelChange)="onTierSizeChange(charge.key, tIdx, $event, asTiered(charge).values[tIdx])"
+                              placeholder="Size threshold"
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              class="field-input tier-table-input"
+                              [ngModel]="asTiered(charge).values[tIdx]"
+                              (ngModelChange)="onTierValueChange(charge.key, tIdx, t, $event)"
+                              placeholder="Value"
+                            />
+                          </td>
+                          <td class="action-cell">
+                            @if (asTiered(charge).size_tier.length > 1) {
+                              <button
+                                class="btn-remove-row"
+                                (click)="removeTier(charge.key, tIdx, charge.label)"
+                                title="Remove tier"
+                                type="button"
+                              >
+                                ×
+                              </button>
+                            }
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

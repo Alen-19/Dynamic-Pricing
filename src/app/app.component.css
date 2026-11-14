@@ -1,0 +1,127 @@
+.app-layout {
+  min-height: 100vh;
+  background-color: #f4f6fa;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  flex: 1;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 28px 60px 28px;
+  box-sizing: border-box;
+}
+
+/* Category Filter Tabs */
+.filter-tabs-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tabs-group {
+  display: flex;
+  background: #e2e8f0;
+  padding: 3px;
+  border-radius: 6px;
+  gap: 3px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-btn:hover {
+  color: #0f172a;
+}
+
+.tab-btn.active {
+  background: #ffffff;
+  color: #25396e;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tabs-info {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.search-indicator em {
+  font-style: normal;
+  font-weight: 600;
+  color: #0284c7;
+}
+
+/* Sections Container */
+.sections-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Empty State */
+.empty-state {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #64748b;
+  margin-top: 20px;
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  color: #94a3b8;
+  margin-bottom: 12px;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 6px 0;
+}
+
+.empty-state p {
+  font-size: 14px;
+  margin: 0 0 18px 0;
+}
+
+.btn-clear-filter {
+  background: #25396e;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-clear-filter:hover {
+  background: #1b2950;
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 16px 12px 40px 12px;
+  }
+  .tabs-group {
+    width: 100%;
+    overflow-x: auto;
+  }
+}

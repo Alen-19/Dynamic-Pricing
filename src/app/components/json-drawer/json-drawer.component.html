@@ -1,0 +1,65 @@
+@if (isOpen()) {
+  <div class="drawer-backdrop" (click)="closeDrawer.emit()"></div>
+  <aside class="json-drawer" role="dialog" aria-modal="true">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+        <h3 class="drawer-title">Live Serialized Pricing JSON</h3>
+      </div>
+      <button class="btn-close" (click)="closeDrawer.emit()" title="Close drawer">×</button>
+    </div>
+
+    <div class="drawer-toolbar">
+      <div class="toolbar-left">
+        <button class="btn-tool" (click)="copyJson()" title="Copy JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+          Copy
+        </button>
+        <button class="btn-tool" (click)="downloadJson()" title="Download JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Download
+        </button>
+      </div>
+      <div class="toolbar-right">
+        <button
+          class="btn-tool btn-toggle-mode"
+          [class.active]="isEditMode()"
+          (click)="toggleEditMode()"
+        >
+          {{ isEditMode() ? 'Cancel Edit' : 'Edit / Paste JSON' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="drawer-content">
+      @if (isEditMode()) {
+        <div class="editor-pane">
+          <p class="edit-instructions">
+            Paste or edit raw JSON below. Click <strong>Apply</strong> to immediately update the signal state.
+          </p>
+          <textarea
+            class="json-textarea"
+            [ngModel]="customJsonInput()"
+            (ngModelChange)="customJsonInput.set($event)"
+            spellcheck="false"
+          ></textarea>
+          <div class="editor-actions">
+            <button class="btn-apply" (click)="applyCustomJson()">Apply to State</button>
+          </div>
+        </div>
+      } @else {
+        <pre class="json-code"><code>{{ pricingService.jsonString() }}</code></pre>
+      }
+    </div>
+  </aside>
+}
